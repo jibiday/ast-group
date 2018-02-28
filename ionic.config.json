@@ -1,0 +1,8 @@
+{
+  "name": "ast-group",
+  "app_id": "b35918e3",
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  }
+}
