@@ -1,14 +1,14 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Ionic Blank
+      АСТ Групп
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+  Найдите адрес через поиск (пока без тыканья по карте) и рассчитайте расстояние от МКАД
+  <div id="map" style="height: 80%"></div>
+  <br>
+  <button [disabled]="isButtondisabled" ion-button block outline round (click)="getDistance()">Рассчитать расстояние от МКАД</button>
 </ion-content>
