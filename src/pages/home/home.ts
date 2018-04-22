@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {NavController} from 'ionic-angular';
+import {Component, NgZone, OnInit} from '@angular/core';
+import {NavController, Platform} from 'ionic-angular';
 import {mkad_coords} from "../../Model/MkadCoords";
+import {Tonnage} from "../../Model/Tonnage";
 
 declare let ymaps: any;
 
@@ -11,13 +12,27 @@ declare let ymaps: any;
 export class HomePage implements OnInit {
 
   map;
+  mapHeight: number;
   searchControl;
   distance: number;
   lt = 55.752797;
   lg = 37.622324;
   isButtondisabled: boolean;
+  tonnages = [
+    new Tonnage(1.5, 3500, 20),
+    new Tonnage(5, 4000, 23),
+    new Tonnage(10, 7000, 28),
+    new Tonnage(20, 10000, 35)
+  ];
+  selectedTonnage: Tonnage;
+  totalCost: number;
+  enteredTonnage: number;
 
-  constructor(public navCtrl: NavController) {
+  constructor(public navCtrl: NavController,
+              private ngZone: NgZone,
+              platform: Platform) {
+    this.mapHeight = platform.height() / 2;
+    console.log(this.mapHeight);
   }
 
   ngOnInit(): void {
@@ -60,16 +75,30 @@ export class HomePage implements OnInit {
           closestObject.geometry.getCoordinates(),
           coords
         ]).then(route => {
-            this.map.geoObjects.removeAll();
-            this.map.geoObjects.add(route);
-            this.distance = Math.round(route.getLength() / 1000);
-            this.map.setCenter([55.752797, 37.622324], 7);
-            needed_point.properties.set({iconContent: this.distance + ' км'});
-            this.searchControl.clear();
-            this.map.geoObjects.add(needed_point);
+            this.ngZone.run(() => {
+              this.map.geoObjects.removeAll();
+              this.map.geoObjects.add(route);
+              this.distance = Math.round(route.getLength() / 1000);
+              console.log(this.distance);
+              this.map.setCenter([55.752797, 37.622324], 7);
+              needed_point.properties.set({iconContent: this.distance + ' км'});
+              this.searchControl.clear();
+              this.map.geoObjects.add(needed_point);
+            });
           }
         );
       }
     );
+  }
+
+  calc() {
+    console.log(this.selectedTonnage);
+    this.totalCost = this.selectedTonnage.minimalPrice + (2 * this.selectedTonnage.pricePerKm * this.distance);
+  }
+
+  selectTonnage() {
+    this.selectedTonnage = this.tonnages.find(tonnage => {
+      return tonnage.tonnage >= this.enteredTonnage;
+    })
   }
 }

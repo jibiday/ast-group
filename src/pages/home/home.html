@@ -7,8 +7,32 @@
 </ion-header>
 
 <ion-content padding>
-  Найдите адрес через поиск (пока без тыканья по карте) и рассчитайте расстояние от МКАД
-  <div id="map" style="height: 80%"></div>
+  <ion-list>
+    <ion-item>
+      <ion-label color="primary" fixed>Груз (т):</ion-label>
+      <ion-input [(ngModel)]="enteredTonnage" type="number" (input)="selectTonnage()"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Вместимость машины</ion-label>
+      <ion-select
+        [selectedText]="selectedTonnage?.tonnage ? selectedTonnage?.tonnage +' т' : 'перебор'"
+        [interface]="'action-sheet'"
+        [(ngModel)]="selectedTonnage">
+        <ion-option *ngFor="let tonnage of tonnages" [value]="tonnage">
+          {{tonnage.tonnage + ' т (' + tonnage.minimalPrice + 'р + ' + tonnage.pricePerKm + 'р/км)'}}
+        </ion-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+  <div id="map" [style.height]="mapHeight + 'px'"></div>
   <br>
-  <button [disabled]="isButtondisabled" ion-button block outline round (click)="getDistance()">Рассчитать расстояние от МКАД</button>
+  <button [disabled]="isButtondisabled" ion-button outline (click)="getDistance()">
+    Найти расстояние от МКАД:
+  </button>
+  <span *ngIf="distance">{{distance + ' км'}}</span>
+  <br>
+  <button [disabled]="!selectedTonnage || !distance" ion-button (click)="calc()">Рассчитать ₽:</button>
+  <span *ngIf="totalCost">
+          {{totalCost + ' р'}}
+        </span>
 </ion-content>
