@@ -5,11 +5,29 @@
   "homepage": "http://ionicframework.com/",
   "private": true,
   "scripts": {
+    "electron": "electron .",
+    "electron dist": "electron .",
+    "ebuild":"node_modules/.bin/build",
     "clean": "ionic-app-scripts clean",
     "build": "ionic-app-scripts build",
     "lint": "ionic-app-scripts lint",
     "ionic:build": "ionic-app-scripts build",
-    "ionic:serve": "ionic-app-scripts serve"
+    "ionic:serve": "ionic-app-scripts serve",
+    "start": "electron ."
+  },
+  "main": "electron/electron.js",
+  "build": {
+    "appId": "com.lohanitech.ionic-electron-test",
+    "electronVersion": "1.6.2",
+    "asar":false,
+    "files": [
+      "www/**/*",
+      "electron/*"
+    ]
+  },
+  "config": {
+    "ionic_bundler": "webpack",
+    "ionic_webpack": "./config/webpack.config.js"
   },
   "dependencies": {
     "@angular/common": "5.0.3",
@@ -39,6 +57,9 @@
   },
   "devDependencies": {
     "@ionic/app-scripts": "3.1.8",
+    "@types/electron": "^1.6.10",
+    "electron": "^2.0.0",
+    "electron-builder": "^20.13.3",
     "typescript": "2.4.2"
   },
   "description": "An Ionic project",
