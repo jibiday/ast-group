@@ -9,30 +9,45 @@
 <ion-content padding>
   <ion-list>
     <ion-item>
-      <ion-label color="primary" fixed>Груз (т):</ion-label>
+      <ion-label color="primary">Груз:</ion-label>
       <ion-input [(ngModel)]="enteredTonnage" type="number" (input)="selectTonnage()"></ion-input>
+      <span item-end>т</span>
     </ion-item>
     <ion-item>
-      <ion-label>Вместимость машины</ion-label>
+      <ion-label>Вместимость машины:</ion-label>
       <ion-select
         [selectedText]="selectedTonnage?.tonnage ? selectedTonnage?.tonnage +' т' : 'перебор'"
         [interface]="'action-sheet'"
+        (ionChange)="calc()"
         [(ngModel)]="selectedTonnage">
         <ion-option *ngFor="let tonnage of tonnages" [value]="tonnage">
           {{tonnage.tonnage + ' т (' + tonnage.minimalPrice + 'р + ' + tonnage.pricePerKm + 'р/км)'}}
         </ion-option>
       </ion-select>
     </ion-item>
+    <ion-item>
+      <ion-label color="primary">От МКАД:</ion-label>
+      <ion-input [(ngModel)]="distance" type="number" (input)="calc()"></ion-input>
+      <span item-end>км</span>
+    </ion-item>
+
+    <ion-item>
+      <button ion-button outline item-start (click)="calc()">
+        <ion-icon name="refresh"></ion-icon>
+      </button>
+      <ion-label>
+        Стоимость:
+      </ion-label>
+      <div item-content>
+          <b *ngIf="totalCost">
+          {{totalCost + ' р'}}
+        </b>
+      </div>
+    </ion-item>
   </ion-list>
   <div id="map" [style.height]="mapHeight + 'px'"></div>
   <br>
-  <button [disabled]="isButtondisabled" ion-button outline (click)="getDistance()">
-    Найти расстояние от МКАД:
+  <button [disabled]="isButtondisabled" ion-button block (click)="getDistance()">
+    Вычислить расстояние от МКАД
   </button>
-  <span *ngIf="distance">{{distance + ' км'}}</span>
-  <br>
-  <button [disabled]="!selectedTonnage || !distance" ion-button (click)="calc()">Рассчитать ₽:</button>
-  <span *ngIf="totalCost">
-          {{totalCost + ' р'}}
-        </span>
 </ion-content>

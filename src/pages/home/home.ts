@@ -31,7 +31,7 @@ export class HomePage implements OnInit {
   constructor(public navCtrl: NavController,
               private ngZone: NgZone,
               platform: Platform) {
-    this.mapHeight = platform.height() / 2;
+    this.mapHeight = platform.height() * 0.4;
     console.log(this.mapHeight);
   }
 
@@ -40,7 +40,7 @@ export class HomePage implements OnInit {
       this.map = new ymaps.Map('map', {
         center: [this.lt, this.lg],
         zoom: 7,
-        controls: ['searchControl', 'zoomControl', 'geolocationControl']
+        controls: ['searchControl', 'zoomControl', 'geolocationControl', 'fullscreenControl']
       });
       this.searchControl = this.map.controls.get('searchControl');
       this.searchControl.options.set({noPlacemark: false});
@@ -82,8 +82,8 @@ export class HomePage implements OnInit {
               console.log(this.distance);
               this.map.setCenter([55.752797, 37.622324], 7);
               needed_point.properties.set({iconContent: this.distance + ' км'});
-              this.searchControl.clear();
               this.map.geoObjects.add(needed_point);
+              this.calc();
             });
           }
         );
@@ -92,8 +92,9 @@ export class HomePage implements OnInit {
   }
 
   calc() {
-    console.log(this.selectedTonnage);
-    this.totalCost = this.selectedTonnage.minimalPrice + (2 * this.selectedTonnage.pricePerKm * this.distance);
+    if (this.selectedTonnage && this.distance) {
+      this.totalCost = this.selectedTonnage.minimalPrice + (2 * this.selectedTonnage.pricePerKm * this.distance);
+    }
   }
 
   selectTonnage() {
