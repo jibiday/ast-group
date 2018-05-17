@@ -1,5 +1,5 @@
 import {Component, NgZone, OnInit} from '@angular/core';
-import {NavController, Platform} from 'ionic-angular';
+import {NavController} from 'ionic-angular';
 import {mkad_coords} from "../../Model/MkadCoords";
 import {Tonnage} from "../../Model/Tonnage";
 
@@ -12,7 +12,6 @@ declare let ymaps: any;
 export class HomePage implements OnInit {
 
   map;
-  mapHeight: number;
   searchControl;
   distance: number;
   lt = 55.752797;
@@ -29,10 +28,7 @@ export class HomePage implements OnInit {
   enteredTonnage: number;
 
   constructor(public navCtrl: NavController,
-              private ngZone: NgZone,
-              platform: Platform) {
-    this.mapHeight = platform.height() * 0.4;
-    console.log(this.mapHeight);
+              private ngZone: NgZone) {
   }
 
   ngOnInit(): void {

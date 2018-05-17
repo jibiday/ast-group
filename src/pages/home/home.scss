@@ -1,9 +1,21 @@
+@media all and (min-width: 540px) {
+  #map {
+    height: calc(100vh - 60px - 100px) !important;
+  }
+}
+
+#map {
+  height: calc(100vh - 290px - 60px);
+}
+
 page-home {
 
 }
+
 .input-label {
   display: inline-block;
 }
+
 input {
   text-align: right;
 }
