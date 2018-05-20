@@ -76,7 +76,7 @@ export class HomePage implements OnInit {
               this.map.geoObjects.add(route);
               this.distance = Math.round(route.getLength() / 1000);
               console.log(this.distance);
-              this.map.setCenter([55.752797, 37.622324], 7);
+              ymaps.geoQuery(route.getPaths().get(0)).applyBoundsToMap(this.map, {checkZoomRange: true});
               needed_point.properties.set({iconContent: this.distance + ' км'});
               this.map.geoObjects.add(needed_point);
               this.calc();
