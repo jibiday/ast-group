@@ -14,6 +14,7 @@ export class HomePage implements OnInit {
   map;
   searchControl;
   selectedPoint;
+  mkadPrecisePoint;
   arPlacemarksRez;
   distance: number;
   lt = 55.752797;
@@ -94,17 +95,34 @@ export class HomePage implements OnInit {
     let closestObject = this.arPlacemarksRez.getClosestTo(coords);
 
     ymaps.route([
-      closestObject.geometry.getCoordinates(),
-      coords
+      coords,
+      closestObject.geometry.getCoordinates()
     ]).then(route => {
         this.ngZone.run(() => {
-          this.map.geoObjects.add(route);
-          this.distance = Math.round(route.getLength() / 1000);
-          console.log(this.distance);
-          ymaps.geoQuery(route.getPaths().get(0)).applyBoundsToMap(this.map, {checkZoomRange: true});
-          this.selectedPoint.properties.set({iconContent: this.distance + ' км'});
-          this.map.geoObjects.add(this.selectedPoint);
-          this.calc();
+          loop1: for (let i = 0; i < route.getPaths().getLength(); i++) {
+            let way = route.getPaths().get(i);
+            let segments = way.getSegments();
+            for (let j = 0; j < segments.length; j++) {
+              if (segments[j].getStreet() == 'МКАД') {
+                this.mkadPrecisePoint = new ymaps.Placemark(segments[j].getCoordinates()[0]);
+                this.map.geoObjects.add(this.mkadPrecisePoint);
+                break loop1;
+              }
+            }
+          }
+
+          ymaps.route([
+            coords,
+            this.mkadPrecisePoint.geometry.getCoordinates()
+          ]).then(route2 => {
+            this.map.geoObjects.add(route2);
+            this.distance = Math.round(route2.getLength() / 1000);
+            console.log(this.distance);
+            ymaps.geoQuery(route2.getPaths().get(0)).applyBoundsToMap(this.map, {checkZoomRange: true});
+            this.selectedPoint.properties.set({iconContent: this.distance + ' км'});
+            this.map.geoObjects.add(this.selectedPoint);
+            this.calc();
+          })
         });
       }
     );
