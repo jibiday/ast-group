@@ -13,6 +13,8 @@ export class HomePage implements OnInit {
 
   map;
   searchControl;
+  selectedPoint;
+  arPlacemarksRez;
   distance: number;
   lt = 55.752797;
   lg = 37.622324;
@@ -38,51 +40,72 @@ export class HomePage implements OnInit {
         zoom: 7,
         controls: ['searchControl', 'zoomControl', 'geolocationControl', 'fullscreenControl']
       });
+
+      this.initMkad();
+
+      this.map.events.add('click', event => {
+        this.searchControl.clear();
+        this.map.geoObjects.removeAll();
+        this.selectedPoint = new ymaps.Placemark(event.get('coords'));
+        this.map.geoObjects.add(this.selectedPoint);
+      });
       this.searchControl = this.map.controls.get('searchControl');
       this.searchControl.options.set({noPlacemark: false});
-
+      this.searchControl.events.add('load', event => {
+        this.map.geoObjects.removeAll();
+        this.selectedPoint = null;
+      })
     });
   }
 
-  getDistance() {
+  initMkad() {
     let arPlacemarks = [];
     for (let i = 0; i < mkad_coords[0].length; i++)
       arPlacemarks[i] = new ymaps.Placemark(mkad_coords[0][i]);
     //к сожалению для корректного поиска ближайшей точки их все надо добавить
     //но мы их не будем отображать конечно же
-    let arPlacemarksRez = ymaps.geoQuery(arPlacemarks).addToMap(this.map).setOptions('visible', false);
+    this.arPlacemarksRez = ymaps.geoQuery(arPlacemarks).addToMap(this.map).setOptions('visible', false);
     //вместо этого нарисуем полигон мкада. для красоты. он для расчётов нам не нужен
     // let mkad_polygon = new ymaps.Polygon(this.mkad_coords);
     // ymaps.geoQuery(mkad_polygon).addToMap(this.map);
+    ymaps.geoQuery(arPlacemarks).applyBoundsToMap(this.map, {checkZoomRange: true});
+  }
 
-    this.searchControl.getResult(0).then(res => {
-        let needed_point, obj_collection;
-        // if (needed_point)
-        //   obj_collection.removeFromMap(this.map);
+  getDistance() {
+    if (this.selectedPoint) {
+      this.getRoute(this.selectedPoint);
+    } else {
+      this.searchControl.getResult(0).then(res => {
+          this.map.geoObjects.removeAll();
+          this.getRoute(res);
+        }
+      );
+    }
+  }
 
-        let coords = res.geometry.getCoordinates();
-        needed_point = new ymaps.Placemark(coords, {}, {preset: 'islands#blueStretchyIcon', draggable: false});
-        // obj_collection = ymaps.geoQuery(needed_point).addToMap(map);
+  getRoute(res) {
+    let coords = res.geometry.getCoordinates();
+    if (coords) {
+      this.selectedPoint = new ymaps.Placemark(coords, {}, {preset: 'islands#blueStretchyIcon', draggable: false});
+    }
+    // obj_collection = ymaps.geoQuery(needed_point).addToMap(map);
 
-        //находим ближайшую точку мкада
-        let closestObject = arPlacemarksRez.getClosestTo(coords);
+    //находим ближайшую точку мкада
+    let closestObject = this.arPlacemarksRez.getClosestTo(coords);
 
-        ymaps.route([
-          closestObject.geometry.getCoordinates(),
-          coords
-        ]).then(route => {
-            this.ngZone.run(() => {
-              this.map.geoObjects.removeAll();
-              this.map.geoObjects.add(route);
-              this.distance = Math.round(route.getLength() / 1000);
-              console.log(this.distance);
-              ymaps.geoQuery(route.getPaths().get(0)).applyBoundsToMap(this.map, {checkZoomRange: true});
-              needed_point.properties.set({iconContent: this.distance + ' км'});
-              this.map.geoObjects.add(needed_point);
-              this.calc();
-            });
-          }
-        );
+    ymaps.route([
+      closestObject.geometry.getCoordinates(),
+      coords
+    ]).then(route => {
+        this.ngZone.run(() => {
+          this.map.geoObjects.add(route);
+          this.distance = Math.round(route.getLength() / 1000);
+          console.log(this.distance);
+          ymaps.geoQuery(route.getPaths().get(0)).applyBoundsToMap(this.map, {checkZoomRange: true});
+          this.selectedPoint.properties.set({iconContent: this.distance + ' км'});
+          this.map.geoObjects.add(this.selectedPoint);
+          this.calc();
+        });
       }
     );
   }
