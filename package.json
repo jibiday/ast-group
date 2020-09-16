@@ -58,7 +58,7 @@
   "devDependencies": {
     "@ionic/app-scripts": "3.1.8",
     "@types/electron": "^1.6.10",
-    "electron": "^2.0.0",
+    "electron": "^10.1.2",
     "electron-builder": "^20.13.3",
     "typescript": "2.4.2"
   },
